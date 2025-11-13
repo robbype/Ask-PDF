@@ -26,7 +26,7 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/auth/register", {
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,7 +41,7 @@ export default function SignupPage() {
         return;
       }
 
-      router.push("/login");
+      router.push("/auth/login");
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");

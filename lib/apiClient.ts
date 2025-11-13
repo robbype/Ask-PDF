@@ -18,9 +18,8 @@ function buildQuery(params?: Record<string, any>): string {
 }
 
 export function createApiClient() {
-  const token = cookies().get("token")?.value;
-
   async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
+    const token = (await cookies()).get("token")?.value;
     const headers: HeadersInit = {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
