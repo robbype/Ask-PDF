@@ -5,17 +5,50 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
+
+interface SignupResponse {
+  success?: boolean;
+  error?: string;
+}
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const signupMutation = useMutation({
+    mutationFn: async ({
+      username,
+      email,
+      password,
+    }: {
+      username: string;
+      email: string;
+      password: string;
+    }) => {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data: SignupResponse = await res.json();
+      if (!res.ok) throw new Error(data.error || "Registration failed");
+      return data;
+    },
+    onSuccess: () => {
+      router.push("/login");
+    },
+    onError: (err: any) => {
+      setError(err.message || "Something went wrong. Please try again.");
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -24,29 +57,7 @@ export default function SignupPage() {
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.detail || "Registration failed");
-        setLoading(false);
-        return;
-      }
-
-      router.push("/auth/login");
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again.");
-      setLoading(false);
-    }
+    signupMutation.mutate({ username, email, password });
   };
 
   return (
@@ -104,14 +115,20 @@ export default function SignupPage() {
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating account..." : "Sign Up"}
+          <Button type="submit" className="w-full" disabled={signupMutation.isPending}>
+            {signupMutation.isPending ? "Creating account..." : "Sign Up"}
           </Button>
+
+          {signupMutation.isError && (
+            <p className="text-red-500 text-sm">
+              {(signupMutation.error as Error)?.message || "Something went wrong"}
+            </p>
+          )}
         </form>
 
         <p className="text-center text-muted-foreground mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/auth/login" className="text-primary hover:underline">
             Sign in
           </Link>
         </p>

@@ -20,18 +20,26 @@ function buildQuery(params?: Record<string, any>): string {
 export function createApiClient() {
   async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
     const token = (await cookies()).get("token")?.value;
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    };
-
     const query = buildQuery(options.params);
+
+    let headers: HeadersInit = { ...options.headers };
+    let body: any = undefined;
+
+    if (options.body instanceof FormData) {
+      body = options.body;
+    } else if (options.body) {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify(options.body);
+    }
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
 
     const res = await fetch(`${BASE_URL}${url}${query}`, {
       ...options,
       headers,
-      body: options.body ? JSON.stringify(options.body) : undefined,
+      body,
     });
 
     if (!res.ok) {
