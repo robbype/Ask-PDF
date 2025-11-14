@@ -3,8 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Upload, MessageSquare, Zap } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LandingPage() {
+  const { isLoggedIn } = useAuth();
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -14,12 +16,20 @@ export default function LandingPage() {
             <div className="text-2xl font-bold text-primary cursor-pointer">ChatPDF</div>
           </Link>
           <div className="flex gap-4">
-            <Link href="/login">
-              <Button variant="ghost">Login</Button>
-            </Link>
-            <Link href="/signup">
-              <Button>Sign Up</Button>
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/dashboard">
+                <Button>Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost">Login</Button>
+                </Link>
+                <Link href="/signup">
+                  <Button>Sign Up</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
