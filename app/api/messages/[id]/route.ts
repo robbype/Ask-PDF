@@ -6,7 +6,7 @@ export async function GET(_req: Request, context: { params: Promise<{ id: string
   const api = createApiClient();
 
   try {
-    const res = await api.get(`/pdf/messages/${id}`);
+    const res = await api.get(`/messages/${id}`);
 
     return NextResponse.json(res);
   } catch (err: any) {

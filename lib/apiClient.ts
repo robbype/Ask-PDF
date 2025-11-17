@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const BASE_URL = process.env.BACKEND_API_URL || "http://localhost:8000/api";
+const BASE_URL = process.env.BACKEND_API_URL || "http://localhost:8000";
 
 interface RequestOptions extends Omit<RequestInit, "body"> {
   body?: any;
