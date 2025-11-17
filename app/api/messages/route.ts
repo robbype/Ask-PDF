@@ -7,8 +7,8 @@ export async function POST(req: Request) {
 
   try {
     const apiClient = createApiClient();
-    const data = await apiClient.post("/pdf/ask", { document_id, question });
-
+    const data = await apiClient.post("/messages", { document_id, question });
+    console.log(data);
     return NextResponse.json(data);
   } catch (err) {
     console.error("Proxy error:", err);

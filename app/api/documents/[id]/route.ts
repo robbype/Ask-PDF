@@ -6,7 +6,7 @@ export async function DELETE(_req: Request, context: { params: Promise<{ id: str
 
   const apiClient = createApiClient();
 
-  const res = await apiClient.delete(`/pdf/documents/${id}`);
+  const res = await apiClient.delete(`/documents/${id}`);
 
   return NextResponse.json(res);
 }
